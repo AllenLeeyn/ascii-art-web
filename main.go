@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 )
 
@@ -20,42 +19,44 @@ type AsciiPg struct {
 	Banner string
 }
 
+var indexTmpl = template.Must(template.ParseFiles("templates/index.html"))
+var errTmpl = template.Must(template.ParseFiles("templates/error.html"))
+
 func main() {
 	reqFiles := []string{
-		"./assets/shadow.txt",
-		"./assets/standard.txt",
-		"./assets/thinkertoy.txt",
+		"./assets/styles/shadow.txt",
+		"./assets/styles/standard.txt",
+		"./assets/styles/thinkertoy.txt",
 		"./static/styles.css",
-		"./templates/index.html",
-		"./templates/error.html",
 	}
-
 	checkRequired(reqFiles)
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
-	http.HandleFunc("/", homeHandler)
+
+	mux := http.NewServeMux()
+	mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	mux.HandleFunc("/", homeHandler)
+	mux.HandleFunc("/ascii-art", homeHandler)
 
 	log.Println("Listening and serving on :8080...")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":8080", mux))
 }
 
 // homeHandler() handlers GET and POST request to "/" and "/ascii-art"
 func homeHandler(w http.ResponseWriter, req *http.Request) {
-	printRequest(req)
 	if req.URL.Path != "/" && req.URL.Path != "/ascii-art" {
 		errorHandler(w, http.StatusNotFound)
 		return
 	}
 	page := &AsciiPg{Banner: "standard"}
-	if !isFileThere("./assets/" + page.Banner + ".txt") {
+	if !isFileThere("./assets/styles/" + page.Banner + ".txt") {
 		errorHandler(w, http.StatusInternalServerError)
 		return
 	}
 	page.P.Title, _ = generator.GenArt("ASCII-ART", "standard")
-	page.P.Msg, _ = generator.GenArt("Enter text here", "standard")
+	page.P.Msg, _ = generator.GenArt("Enter text\nhere", "standard")
 
 	switch req.Method {
 	case "GET":
-		getTemplate(w, "index", page)
+		indexTmpl.Execute(w, page)
 	case "POST":
 		handlePost(w, req, page)
 	default:
@@ -63,44 +64,33 @@ func homeHandler(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-// getTemplate() grabs the template and
-// write the response using the page info given
-func getTemplate(w http.ResponseWriter, tmplNm string, page any) {
-	tmpl, err := template.ParseFiles("templates/" + tmplNm + ".html")
-	if err != nil {
-		errorHandler(w, http.StatusNotFound)
-		return
-	}
-	w.WriteHeader(http.StatusOK) // 200
-	tmpl.Execute(w, page)
-}
-
 // handlePost() handles
 func handlePost(w http.ResponseWriter, req *http.Request, page *AsciiPg) {
 	text, banner, formErr := getFormInputs(req)
-	text = strings.ReplaceAll(text, "\r", "")
-	text = strings.Trim(text, "\n")
 	if formErr != "" {
 		errorHandler(w, http.StatusBadRequest)
 		return
 	}
-	if !isFileThere("./assets/" + banner + ".txt") {
+	text = strings.ReplaceAll(text, "\r", "")
+	text = strings.Trim(text, "\n")
+
+	if !isFileThere("./assets/styles/" + banner + ".txt") {
 		errorHandler(w, http.StatusInternalServerError)
 		return
 	}
 	if art, err := generator.GenArt(text, banner); err != nil {
 		page.P.Msg = "Failed to generate ASCII art: " + err.Error()
-		goto getTemplateLn
 	} else {
 		page.P.Msg = art
 	}
 	page.Text = text
 	page.Banner = banner
-getTemplateLn:
-	getTemplate(w, "index", page)
+
+	indexTmpl.Execute(w, page)
 }
 
-// getFormInputs() gets the text and banner input from the form in the POST request
+// getFormInputs() gets the text and banner input from the form in the POST request.
+// Returns text, banner and error message.
 func getFormInputs(req *http.Request) (string, string, string) {
 	if err := req.ParseForm(); err != nil {
 		return "", "", "400"
@@ -109,7 +99,7 @@ func getFormInputs(req *http.Request) (string, string, string) {
 	banner := req.Form.Get("banner")
 
 	if text == "" || banner == "" {
-		return "", "Please type in your text and select banner style.", ""
+		return "", "", "400"
 	}
 	return text, banner, ""
 }
@@ -117,27 +107,28 @@ func getFormInputs(req *http.Request) (string, string, string) {
 // errorHandler() generate custom error page responses.
 // If error.html can't be parse, default to simple error page
 func errorHandler(w http.ResponseWriter, statusCode int) {
-	page := &Page{Title: strconv.Itoa(statusCode)}
+	page := &Page{}
 	w.WriteHeader(statusCode)
-	switch page.Title {
-	case "400":
+	txt := ""
+	switch statusCode {
+	case 400:
+		txt = "400"
 		page.Msg = "400 bad request"
-	case "404":
+	case 404:
+		txt = "404"
 		page.Msg = "404 page not found"
-	case "405":
+	case 405:
+		txt = "405"
 		page.Msg = "405 method not allowed"
-	case "500":
+	case 500:
+		txt = "500"
 		page.Msg = "500 internal server error"
 	default:
+		txt = "000"
 		page.Msg = "an unexpected error occurred"
 	}
-	tmpl, err := template.ParseFiles("templates/error.html")
-	if err != nil {
-		http.Error(w, "404 page not found\n"+err.Error(), http.StatusNotFound) // 404
-		return
-	}
-	page.Title, _ = generator.GenArt(page.Title, "standard")
-	tmpl.Execute(w, page)
+	page.Title, _ = generator.GenArt(txt, "standard")
+	errTmpl.Execute(w, page)
 }
 
 // checkRequired() checks a list of files if they exist or not.
@@ -154,13 +145,4 @@ func checkRequired(reqFiles []string) {
 func isFileThere(file string) bool {
 	_, err := os.Stat(file)
 	return !os.IsNotExist(err)
-}
-
-// printRequest() prints the first two lines of a HTTP Request header
-func printRequest(r *http.Request) {
-	log.Printf("\n=== HTTP Request Info ===\n"+
-		"%s %s %s\n"+
-		"Host: %s\n"+
-		"---------------------------\n\n",
-		r.Method, r.URL, r.Proto, r.Host)
 }

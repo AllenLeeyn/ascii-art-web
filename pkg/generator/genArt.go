@@ -33,7 +33,6 @@ func GenArt(txt, styleNm string) (string, error) {
 
 // checkInput() checks txt string and split it by newline
 func checkInput(txt string) ([]string, error) {
-	txt = strings.ReplaceAll(txt, "\r", "")
 	txtLns := strings.Split(txt, "\n")
 	isEmpty := true
 
@@ -55,7 +54,7 @@ func checkInput(txt string) ([]string, error) {
 
 // getStyle read <styleName>.txt and store the ascii art runes in a map[rune][]string.
 func getStyle(styleNm string) {
-	rawStyle := strings.Split(fileMgr.ReadFile("./assets/"+styleNm+".txt"), "\n")
+	rawStyle := strings.Split(fileMgr.ReadFile("./assets/styles/"+styleNm+".txt"), "\n")
 	for i := 1; i < len(rawStyle); i = i + 9 {
 		style[rune(32+i/9)] = rawStyle[i : i+8]
 	}

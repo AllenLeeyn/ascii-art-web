@@ -7,7 +7,7 @@
  \__,_| |___/  \___| |_| |_|           \__,_| |_|     \__|            \_/\_/    \___| |_.__/  
                                                                                               
                                                                                               
-By Allen Lee (ylee) & Othemane Afiali (oafiali)
+By Allen Lee (ylee) & Othmane Afiali (oafiali)
 ```
 
 # ascii-art-web
@@ -102,25 +102,6 @@ flowchart TB
     - and getTemplate() to generate the response with the output
 
 Note:
-- html.Template help us to generate the desired html response page without spending too much time on the html files. We have to include some of html.Template snytax in the html files and parse it to generate the desired result.
+- net/http help us starts the server, listen and handles the requests.
+- html/template help us to generate the desired html response page without spending too much time on the html files. We have to include some of html.Template snytax in the html files and parse it to generate the desired result.
 - When encountering an error with a HTTP request or response, errorHandler() is used to generate a custom error page. If the `error.html` is not found, a simple error message is display instead.
-
-## Tasks
-- main.go
-    - reorganize code for imrpove readability (Ozzy)
-
-- Design index.html and css
-    - more functionality?
-    - added icon
-- clean up css(?)
-
-- Learn HTTP protocol, handlers and pattern
-    - focus on HTTP status code 
-- Learn server and client
-- Implement more ASCII art functionality?
-    - ANSI color won't work
-
-## Optionals
-- export output
-- stylize with css (Basically done)
-- dockerize

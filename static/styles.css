@@ -1,6 +1,7 @@
 html, body{
     height:100%;
     min-width: 800px;
+    color: #ee0;
     background-color: #333;
     font-family: 'Courier New', Courier, monospace;
     margin: 0px;
@@ -8,33 +9,27 @@ html, body{
     flex-direction: column;
 }
 .top-bar{
+    color: #ee0;
     background-color: #222;
     padding: 10px 20px;
 }
 .top-bar a {
-    color: #ee0;
     text-decoration: none;
 }
 .top-bar a:hover{
     color:#f80;
 }
 .container {
+    padding: 5px 10px;
     max-width: 90%;
     min-width: 60%;
     margin: auto;
-    color:#ee0;
     flex: 1;
 }
 .title {
     text-align: center;
     font-size: 12px;
     font-weight: bold;
-}
-.errTitle{
-    text-align: center;
-    font-size: 16px;
-    font-weight: bold;
-    color:#f00;
 }
 textarea {
     width: 100%;
@@ -70,17 +65,8 @@ textarea:focus{
     color: #0f0;
     overflow: auto;
 }
-.errMessage {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    min-height: 200px;
-    font-size: 27px;
-    background-color: #222;
-    color: #f00;
-}
 .footer {
     background-color: #222;
-    color: #ee0;
     font-size: 10px;
     padding: 5px 10px;
 }
