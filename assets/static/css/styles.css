@@ -9,11 +9,11 @@ html, body{
     flex-direction: column;
 }
 .top-bar{
-    color: #ee0;
     background-color: #222;
     padding: 10px 20px;
 }
 .top-bar a {
+    color: #ee0;
     text-decoration: none;
 }
 .top-bar a:hover{

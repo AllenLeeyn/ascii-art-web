@@ -16,7 +16,9 @@ The website is hosted on the local machine using port 8080.
 Only `localhost:8080/` and `localhost:8080/ascii-art`are valid URL.
 
 ## Usage
-Prerequisites: Golang, git and a browser application.
+Prerequisites: 
+- golang version 1.22.6 
+- git version 2.46.0
 
 Download the project using `git clone https://01.gritlab.ax/git/ylee/ascii-art-web.git`. Navigate to the project folder in the terminal and start the server by entering `go run main.go`. Key in a valid URL, `localhost:8080/` or `localhost:8080/ascii-art`. And you will see the home page (refer to image below). You will see:
 - a top bar with a link to the `homepage` and `about`
@@ -29,7 +31,7 @@ Download the project using `git clone https://01.gritlab.ax/git/ylee/ascii-art-w
 
 ![alt text](assets/images/image.png)
 
-Simply enter the your text, select the banner style and click the button to generate the ASCII art banner.
+Simply enter your text, select the banner style and click the button to generate the ASCII art banner.
 Leading and trailing newlines will be remove (user can enter the newlines themselves).
 Only ASCII characters (from 32 to 127) and newline is considered acceptable input.
 
@@ -54,15 +56,15 @@ flowchart TB
     subgraph server [SERVER]
     start{"go run main.go"}
         subgraph main ["main()"]
-            checkReq("checkRequired()
-            If missing, log.Fatal")
+            checkReq("generator.GetStyles()
+            template.Must()")
             static("define static 
             FileServer route")
             register("http.HandleFunc(/, homeHandler)")
             listener("http.ListenAndServe(8080)")
         end
         homeFn("homeHandler()")
-        template("getTemplate()")
+        template("template.Execute()")
         subgraph handlePost ["handlePost()"]
             rForm("getFormInputs()")
             clean("clean inputs for genArt()")
@@ -89,17 +91,17 @@ flowchart TB
     genArt--Missing files-->missing;
 ```
 
-1. In main, checkRequired() function checks if all necessary files (such as templates, static resources, etc.) exist in the project folder.
-2. `/static` is defined as static server route to server static files effectively to clients.
-3. The homeHandler() function is registered to the pattern `/`, handling incoming requests to the root (in this situation, it is effectively handling all incoming requests other than `/static`).
+1. In main(), generator.GetStyles() and template.Must() load the neccessary files into memory before starting the server. `index.html` and `error.html` is loaded into `indexTmpl` and `errorTmpl` respectively.
+2. `/static/` is defined as static server route to server static files `/assets/static/`effectively to clients.
+3. The homeHandler() function is registered to the pattern `/`, handling incoming requests to the root (in this situation, it is effectively handling all incoming requests other than `/static`). `/` and `/ascii-art` are considered valid URL by homeHandler().
 4. http.ListenAndServe("8080") starts listening on local port 8080 and use the [DefaultServeMux] to handle requests.
-5. The client (browser application) can send HTTP requests to the server.  If it is valid, the server will reply with a HTTP response (HTML page) and the 200 status code. Else, an error page with 404 status code.
-5. If it is a valid `GET` request, getTemplate() is called. getTemplate() uses the html.Template.ParseFiles() and Execute() to generate the response file (HTML).
-6. The response (home page) is display by the client and the user can input the desired parameters. When the `Generate ASCII Art` button is hit, a POST request is sent to the server with the user input.
+5. The client (browser application) can send HTTP requests to the server.  If it is valid, the server will reply with a HTTP response (HTML page) and the 200 status code. Else, an error page with error status code.
+5. If it is a valid `GET` request, homeHandler calls `indexTmpl.Execute()` to generate the response file (HTML).
+6. The response (home page) is display by the client and the user can input the desired parameters. When the `Generate ASCII Art` button is hit, a POST request is sent to `/ascii-art` with the user input.
 7. If it is a `POST` request, handlePost() is called and in it:
     - we grab the user inputs using getFormInputs() (http.Request.ParseForm())
     - we generate the output with GenArt()
-    - and getTemplate() to generate the response with the output
+    - and `indexTmpl.Execute()` to generate the response with the output
 
 Note:
 - net/http help us starts the server, listen and handles the requests.
