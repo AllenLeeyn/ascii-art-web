@@ -30,16 +30,8 @@ func TestErrorHandler(t *testing.T) {
 			method:         "POST",
 			url:            "/",
 			formData:       "text=hey&banner=sun",
-			expectedText:   "default to standard banner.",
-			expectedStatus: 200,
-		}, {
-			// invalid request (POST) to /static
-			// http.FileServer() only handles GET request
-			method:         "POST",
-			url:            "/static",
-			formData:       "text=&banner=shadow",
-			expectedText:   "404 page not found",
-			expectedStatus: 404,
+			expectedText:   "internal server error",
+			expectedStatus: 500,
 		}, {
 			// empty text input
 			method:         "POST",

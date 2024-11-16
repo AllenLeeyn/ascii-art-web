@@ -4,13 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
     <title>ascii-art-web</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
+    <link id="style_switcher" rel="stylesheet" href="/static/dark_theme.css">
+    <script src="/static/themeSwitch.js"></script>
 </head>
 <body>
     <header class="top-bar">
-        <a href="/">ascii-art-web</a>
+        <div>
+            <a href="/">ascii-art-web</a>
+            <a href="/about">About</a>
+        </div>
+        <button class="switchBtn" id="themeToggleButton" onclick="switchStyle()"></button>
     </header>
 
     <div class="container">
@@ -19,7 +24,7 @@
             <p>Simply key in your text below, select the banner style <br>
                 and click the button to generate your own ASCII art banner.<br>
                 Leading and trailing newlines will be remove.<br>
-                Only characters between the range of ASCII code 32 to 127  and newline is accepted.</p>
+                Only characters between the range of <a class="redirect" href="https://www.asciitable.com">ASCII</a> code 32 to 127  and newline is accepted.</p>
         </div>
 
         <form action="ascii-art" method="POST">
@@ -35,32 +40,37 @@ here"
 
             <div class="radio-group">
                 <label>Select Banner Style:</label>
-                    <input 
-                        type="radio"
-                        id="standard"
-                        name="banner"
-                        value="standard"
-                        required
-                        {{if eq .Banner "standard"}} checked {{end}}>
-                    <label for="standard">standard</label>
+                    <label for="standard">
+                        <input 
+                            type="radio"
+                            id="standard"
+                            name="banner"
+                            value="standard"
+                            {{if eq .Banner "standard"}} checked {{end}}>
+                        standard
+                    </label>
+                    
+                    
+                    <label for="shadow">
+                        <input 
+                            type="radio"
+                            id="shadow"
+                            name="banner"
+                            value="shadow"
+                            {{if eq .Banner "shadow"}} checked {{end}}>
+                        shadow
+                    </label>
 
-                    <input 
-                        type="radio"
-                        id="shadow"
-                        name="banner"
-                        value="shadow"
-                        required
-                        {{if eq .Banner "shadow"}} checked {{end}}>
-                    <label for="shadow">shadow</label>
-
-                    <input 
-                        type="radio"
-                        id="thinkertoy"
-                        name="banner"
-                        value="thinkertoy"
-                        required
-                        {{if eq .Banner "thinkertoy"}} checked {{end}}>
-                    <label for="thinkertoy">thinkertoy</label>
+                    
+                    <label for="thinkertoy">
+                        <input 
+                            type="radio"
+                            id="thinkertoy"
+                            name="banner"
+                            value="thinkertoy"
+                            {{if eq .Banner "thinkertoy"}} checked {{end}}>
+                        thinkertoy
+                    </label>
             </div>
 
             <button type="submit" class="submit">Generate ASCII Art</button>
@@ -72,7 +82,7 @@ here"
     </div>
 
     <footer class="footer">
-        <p>Created by Allen Lee (ylee) & Othemane Afiali (oafiali)</p>
+        <p>Created by Allen Lee (ylee) & Othmane Afilali (oafilali)</p>
     </footer>
 </body>
 </html>

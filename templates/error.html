@@ -4,14 +4,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
     <title>error</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
+    <link id="style_switcher" rel="stylesheet" href="/static/dark_theme.css">
+    <script src="/static/themeSwitch.js"></script>
 </head>
 <body>
     <header class="top-bar">
-        <a href="/">ascii-art-web</a>
+        <div>
+            <a href="/">ascii-art-web</a>
+            <a href="/about">About</a>
+        </div>
+        <button class="switchBtn" id="themeToggleButton" onclick="switchStyle()"></button>
     </header>
+    
     <div class="container">
         <div class="title" style="color: red">
             <pre>{{.Title}}</pre>
@@ -21,8 +27,8 @@
             <pre>{{.Msg}}</pre>
         </div>
     </div>
-    <footer class="footer" >
-        <p>Created by Allen Lee (ylee) & Othemane Afiali (oafiali)</p>
+    <footer class="footer">
+        <p>Created by Allen Lee (ylee) & Othmane Afilali (oafilali)</p>
     </footer>
 </body>
 </html>

@@ -1,0 +1,100 @@
+<!-- templates/about.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+    <title>About</title>
+    <link id="style_switcher" rel="stylesheet" href="/static/dark_theme.css">
+    <script src="/static/themeSwitch.js"></script>
+</head>
+<body>
+    <header class="top-bar">
+        <div>
+            <a href="/">ascii-art-web</a>
+            <a href="/about">About</a>
+        </div>
+        <button class="switchBtn" id="themeToggleButton" onclick="switchStyle()"></button>
+    </header>
+    
+    <div class="about-container">
+        <div class="content-box">
+            <pre>
+                      _   _                           _                                _      
+                     (_) (_)                         | |                              | |     
+  __ _   ___    ___   _   _   ______    __ _   _ __  | |_   ______  __      __   ___  | |__   
+ / _` | / __|  / __| | | | | |______|  / _` | | '__| | __| |______| \ \ /\ / /  / _ \ | '_ \  
+| (_| | \__ \ | (__  | | | |          | (_| | | |    \ |_            \ V  V /  |  __/ | |_) | 
+ \__,_| |___/  \___| |_| |_|           \__,_| |_|     \__|            \_/\_/    \___| |_.__/  
+                                                                                              
+                                                                                              
+By Allen Lee (ylee) & Othmane Afilali (oafilali)
+            </pre>
+
+            <h1>ascii-art-web</h1>
+            <p>A web version of the ascii-art with simple GUI for easy usability.</p>
+            <p>The website is hosted on the local machine using port 8080.</p>
+            <p>Only <code>localhost:8080/</code> and <code>localhost:8080/ascii-art</code> are valid URLs.</p>
+
+            <h2>Usage</h2>
+            <p>Prerequisites:</p>
+            <ul>
+                <li>- golang version 1.22.6</li>
+                <li>- git version 2.46.0</li>
+            </ul>
+
+            <p>Download the project using <code>git clone https://01.gritlab.ax/git/ylee/ascii-art-web.git</code>. Navigate to the project folder in the terminal and start the server by entering <code>go run main.go</code>. Key in a valid URL, <code>localhost:8080/</code> or <code>localhost:8080/ascii-art</code>. And you will see the home page (refer to image below). You will see:</p>
+            <ul>
+                <li>a top bar with a link to the <code>homepage</code> and <code>about</code></li>
+                <li>an ascii art banner</li>
+                <li>a short description on how to use the site</li>
+                <li>a text field for user to input text</li>
+                <li>radio buttons to select banner style</li>
+                <li>a button to generate the ascii art</li>
+                <li>result output</li>
+            </ul>
+            <img src="/static/images/home.png" alt="ascii-art-web screenshot">
+            <p>Simply enter your text, select the banner style and click the button to generate the ASCII art banner.Leading and trailing newlines will be removed. Only ASCII characters (from 32 to 127) and newline is considered acceptable input.</p>
+            <p>Non-printable ASCII characters will result in an error.</p>
+
+            <h2>Implementation</h2>
+            <p>Below is a flowchart that maps out how the program works.</p>
+            <img src="/static/images/flowchart.png" alt="flowchart screenshot">
+
+            <ol>
+                <li>In main, <code>generator.GetStyles()</code> and <code>template.Must()</code> load the neccessary files into memory before starting the server.</li>
+                <li><code>/static</code> is defined as static server route to serve static files from <code>/assets/static/</code> effectively to clients.</li>
+                <li>The <code>homeHandler()</code> function is registered to the pattern <code>/</code>, handling incoming requests to the root (in this situation, it is effectively handling all incoming requests other than <code>/static</code>).</li>
+                <li><code>http.ListenAndServe("8080")</code> starts listening on local port 8080 and uses the [DefaultServeMux] to handle requests.</li>
+                <li>The client (browser application) can send HTTP requests to the server. If it is valid, the server will reply with a HTTP response (HTML page) and the 200 status code. Else, an error page with error status code.</li>
+                <li>If it is a valid <code>GET</code> request, <code>homeHandler()</code> calls <code>indexTmpl.Execute()</code> to generate the response file (HTML).</li>
+                <li>The response (home page) is displayed by the client and the user can input the desired parameters. When the <code>Generate ASCII Art</code> button is hit, a <code>POST</code> request is sent to the server with the user input.</li>
+                <li>If it is a <code>POST</code> request, <code>handlePost()</code> is called and in it:
+                    <ul>
+                        <li>we grab the user inputs using <code>getFormInputs()</code> (<code>http.Request.ParseForm()</code>)</li>
+                        <li>we generate the output with <code>GenArt()</code></li>
+                        <li>and <code>indexTmpl.Execute()</code> generates the response with the output</li>
+                    </ul>
+                </li>
+            </ol>
+            <p>Note:</p>
+            <ul>
+                <li><code>net/http</code> help us starts the server, listen and handles the requests.</li>
+                <li><code>html/template</code> helps us to generate the desired HTML response page without needing different html files for slight differences. We have to include some of <code>html/template</code> syntax in the HTML files and parse it to generate the desired result.</li>
+                <li>When encountering an error with an HTTP request or response, <code>errorHandler()</code> is used to generate a custom error page. If the <code>error.html</code> is not found, a simple error message is displayed instead.</li>
+            </ul>
+
+            <h2>Future Features</h2>
+            <ul>
+                <li>Export output</li>
+                <li>More styles(?)</li>
+                <li>Dockerize</li>
+            </ul>
+        </div>
+    </div>
+    <footer class="footer">
+        <p>Created by Allen Lee (ylee) & Othmane Afilali (oafilali)</p>
+    </footer>
+</body>
+</html>

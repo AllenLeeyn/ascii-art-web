@@ -3,6 +3,7 @@ package generator
 import (
 	"ascii-art-web/pkg/fileMgr"
 	"fmt"
+	"log"
 	"strings"
 )
 
@@ -10,7 +11,7 @@ var styleNames = []string{"standard", "shadow", "thinkertoy"}
 var styles = make(map[string]string)
 var style = make(map[rune][]string)
 
-// GenArt calls the functions to generate ascii art string
+// GenArt() calls the functions to generate ascii art string
 func GenArt(txt, styleNm string) (string, error) {
 	txtLns, err := checkInput(txt)
 	if err != nil {
@@ -40,7 +41,11 @@ func GenArt(txt, styleNm string) (string, error) {
 }
 
 // checkInput() checks txt string and split it by newline
+// and cleans up the text of carriage returns, leadind and trailing newlines.
+// Returns []txtLns by spliting txt with newlines
 func checkInput(txt string) ([]string, error) {
+	txt = strings.ReplaceAll(txt, "\r", "")
+	txt = strings.Trim(txt, "\n")
 	txtLns := strings.Split(txt, "\n")
 	isEmpty := true
 
@@ -60,7 +65,7 @@ func checkInput(txt string) ([]string, error) {
 	return txtLns, nil
 }
 
-// getStyle process [styleNm]styles and store the ascii art runes in a map[rune][]string.
+// getStyle read <styleName>.txt and store the ascii art runes in a map[rune][]string.
 func getStyle(styleNm string) {
 	rawStyle := strings.Split(styles[styleNm], "\n")
 	for i := 1; i < len(rawStyle); i = i + 9 {
@@ -73,5 +78,24 @@ func GetStyles() {
 	for _, styleNm := range styleNames {
 		rawStyle := fileMgr.ReadFile("./assets/styles/" + styleNm + ".txt")
 		styles[styleNm] = rawStyle
+		checkBannerFormat(rawStyle)
+	}
+}
+
+func checkBannerFormat(rawStyle string) {
+	rawStyleSplit := strings.Split(rawStyle, "\n")
+	if len(rawStyleSplit) != 856 {
+		log.Fatal("Incorrect banner style format")
+	}
+	for i := 1; i < 856; i = i + 9 {
+		if len(rawStyleSplit[i]) != len(rawStyleSplit[i+1]) ||
+			len(rawStyleSplit[i]) != len(rawStyleSplit[i+2]) ||
+			len(rawStyleSplit[i]) != len(rawStyleSplit[i+3]) ||
+			len(rawStyleSplit[i]) != len(rawStyleSplit[i+4]) ||
+			len(rawStyleSplit[i]) != len(rawStyleSplit[i+5]) ||
+			len(rawStyleSplit[i]) != len(rawStyleSplit[i+6]) ||
+			len(rawStyleSplit[i]) != len(rawStyleSplit[i+7]) {
+			log.Fatal("Incorrect banner style format")
+		}
 	}
 }
