@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 )
 
 // aboutHandler handles GET requests to "/about"
@@ -51,6 +52,8 @@ func handlePost(w http.ResponseWriter, req *http.Request, page *AsciiPg) {
 		errorHandler(w, http.StatusInternalServerError)
 		return
 	}
+	text = strings.ReplaceAll(text, "\r", "")
+	text = strings.Trim(text, "\n")
 	if art, err := generator.GenArt(text, banner); err != nil {
 		page.P.Msg = "Failed to generate ASCII art: " + err.Error()
 	} else {

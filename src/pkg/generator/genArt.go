@@ -44,8 +44,6 @@ func GenArt(txt, styleNm string) (string, error) {
 // and cleans up the text of carriage returns, leadind and trailing newlines.
 // Returns []txtLns by spliting txt with newlines
 func checkInput(txt string) ([]string, error) {
-	txt = strings.ReplaceAll(txt, "\r", "")
-	txt = strings.Trim(txt, "\n")
 	txtLns := strings.Split(txt, "\n")
 	isEmpty := true
 
